@@ -1,0 +1,13 @@
+{
+  "page": {
+    "title": "NBA"
+  },
+  "teams": [
+    {"name": "New York Knicks"}, 
+    {"name": "San Antonio Spurs"}
+  ],
+  "players": [
+    { "name": "Kawhi Leonard", "nicknames": ["The Claw"] },
+    { "name": "Draymond Green", "nicknames": ["BDD", "Dray"] }
+  ]
+}

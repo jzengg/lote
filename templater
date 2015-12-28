@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+
+require 'json'
+require 'ostruct'
+
+error_message = "Not enough arguments. Please use the following format:"
+error_message += " templater.rb [template_name] [data_name] [output_file_name]"
+raise error_message if ARGV.size < 2
+
+BLOCK_KEYWORDS = ["EACH"]
+FLOW_KEYWORDS = ["IF", "UNLESS", "ELSE", "ELSIF"]
+END_KEYWORDS = ["END"]
+
+def parse(template, data_object)
+  terms = template.split(/(<\*)\s*(.*?)\s*\*>/)
+  stringified_ruby = "Proc.new do |params, output|\n params ||= {}; html=''\n"
+
+  until terms.empty?
+    term = terms.shift
+    next_term = terms.first unless terms.empty?
+
+    if contains_ruby?(term)
+      keyword_type = keyword_type?(next_term)
+      term = terms.shift unless keyword_type.nil?
+
+      case keyword_type
+      when :end then stringified_ruby << "end\n"
+      when :block
+        parsed_line = parse_block_keyword(term)
+        stringified_ruby << "#{parsed_line}\n"
+      when :flow then stringified_ruby << "#{term.downcase}\n"
+      else stringified_ruby << "html << (#{terms.shift}).to_s\n"
+      end
+
+    else
+      stringified_ruby << "html << #{term.inspect}\n"
+    end
+  end
+
+  stringified_ruby << "html; end"
+  data_object.instance_eval(stringified_ruby)
+end
+
+def contains_ruby?(term)
+  term == "<*"
+end
+
+def keyword_type?(next_term)
+  END_KEYWORDS.each { |keyword| return :end if next_term.include?(keyword) }
+  BLOCK_KEYWORDS.each { |keyword| return :block if next_term.include?(keyword) }
+  FLOW_KEYWORDS.each { |keyword| return :flow if next_term.include?(keyword) }
+  nil
+end
+
+def parse_block_keyword(term)
+  method, key, param_name = term.split(" ")
+  "#{key}.#{method.downcase} do |#{param_name}|"
+end
+
+template_name, data_name, output_name = ARGV
+output_name ||= "output.html"
+data_object = JSON.parse(IO.read(data_name), object_class: OpenStruct)
+
+_proc = parse(IO.read(template_name), data_object)
+output_html = _proc.call
+
+File.open(output_name, 'w') {|file| file.puts output_html}

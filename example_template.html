@@ -1,0 +1,29 @@
+<html>
+  <head>
+    <title><* page.title *></title>
+  </head>
+  <body>
+    <* IF teams.length > 1 *>
+      <h1> Favorite teams </h1>
+      <ul>
+        <* EACH teams team *>
+        <li> <* team.name.upcase *> </li>
+        <* ENDEACH *>
+      </ul>
+    <* ELSIF teams.length == 1 *>
+      <h1> ONLY <* teams.first.name *> </h1>
+    <* ELSE *>
+      <h1> I don't like any teams in particular </h1>
+    <* END *>
+
+    <hr>
+    
+    <h1> Favorite players </h1>
+      <* EACH players player *>
+        <* player.name *>
+        <* EACH player.nicknames nickname *>
+          <p><* nickname *></p>
+        <* ENDEACH *>
+      <* ENDEACH *>
+  </body>
+</html>
