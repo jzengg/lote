@@ -65,3 +65,4 @@ _proc = parse(IO.read(template_name), data_object)
 output_html = _proc.call
 
 File.open(output_name, 'w') {|file| file.puts output_html}
+puts "Successfully saved to #{output_name}"
