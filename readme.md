@@ -1,9 +1,9 @@
 # lote
-A very simple command-line templating engine in Ruby. Takes in an html template file,
-a JSON data file and an optional output file name.
+A very simple command-line templating engine in Ruby. Takes a template file-name,
+a JSON file-name and an optional output file-name as arguments.
 
 ## Supports
-* Nested looping constructs `each`
+* Nested looping constructs using `each`
 * Control flow keywords `if, else, elsif, unless`
 
 ## Syntax
@@ -40,5 +40,8 @@ a JSON data file and an optional output file name.
 * Cd into directory and run templater with the arguments [template_name] [data_name] [output_file_name]
 * Using the example files, you would run `./templater example_template.html example_data.json output.html`
 
-## TBD
-- [] arstarst
+## Future Features
+- [ ] testing
+- [ ] use a regex/grep or another method to avoid using ostruct
+- [ ] support master template file that lists other template files to read
+- [ ] partials with '\_file-name' convention
