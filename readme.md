@@ -8,7 +8,7 @@ a JSON file-name and an optional output file-name as arguments.
 
 ## Syntax
 * The `<* *>` tag denotes a line that contains Ruby.
-* Given data that looks like
+* Say you have data that looks like this
 ```json
 {
   "page": {
@@ -25,7 +25,7 @@ a JSON file-name and an optional output file-name as arguments.
 }
 ```
 * Inside of `<* *>`, self refers to the JSON data.
-* So you can index into json data like this:
+* So you can access the data like this (self can be omitted)
 ```html
 <body>
   <* page.title *>
@@ -54,7 +54,7 @@ a JSON file-name and an optional output file-name as arguments.
 ## How to use
 * Clone this repo
 * Move your template and json file into the lib directory
-* Cd into directory and run templater with the arguments [template_name] [data_name] [output_file_name]
+* cd into directory and run templater with the arguments [template_name] [data_name] [output_file_name]
 * Using the example files, you would run `./templater example_template.html example_data.json output.html`
 
 ## Future Features
