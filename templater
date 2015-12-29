@@ -2,6 +2,7 @@
 
 require 'json'
 require 'ostruct'
+require 'byebug'
 
 error_message = "Not enough arguments. Please use the following format:"
 error_message += " templater.rb [template_name] [data_name] [output_file_name]"
@@ -10,45 +11,47 @@ raise error_message if ARGV.size < 2
 BLOCK_KEYWORDS = ["EACH"]
 FLOW_KEYWORDS = ["IF", "UNLESS", "ELSE", "ELSIF"]
 END_KEYWORDS = ["END"]
+ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
+KEYWORDS_SYMBOL = {END_KEYWORDS => :end, BLOCK_KEYWORDS => :block, FLOW_KEYWORDS => :flow}
 
-def parse(template, data_object)
+def parse(template, context)
   terms = template.split(/(<\*)\s*(.*?)\s*\*>/)
   stringified_ruby = "Proc.new do |params, output|\n params ||= {}; html=''\n"
 
-  until terms.empty?
-    term = terms.shift
+  while current_term = terms.shift
     next_term = terms.first unless terms.empty?
 
-    if contains_ruby?(term)
+    if contains_ruby?(current_term)
       keyword_type = keyword_type?(next_term)
-      term = terms.shift unless keyword_type.nil?
+      current_term = terms.shift unless keyword_type.nil?
 
       case keyword_type
       when :end then stringified_ruby << "end\n"
       when :block
-        parsed_line = parse_block_keyword(term)
+        parsed_line = parse_block_keyword(current_term)
         stringified_ruby << "#{parsed_line}\n"
-      when :flow then stringified_ruby << "#{term.downcase}\n"
+      when :flow then stringified_ruby << "#{current_term.downcase}\n"
       else stringified_ruby << "html << (#{terms.shift}).to_s\n"
       end
 
     else
-      stringified_ruby << "html << #{term.inspect}\n"
+      stringified_ruby << "html << #{current_term.inspect}\n"
     end
   end
 
   stringified_ruby << "html; end"
-  data_object.instance_eval(stringified_ruby)
+  context.instance_eval(stringified_ruby)
 end
 
 def contains_ruby?(term)
   term == "<*"
 end
 
-def keyword_type?(next_term)
-  END_KEYWORDS.each { |keyword| return :end if next_term.include?(keyword) }
-  BLOCK_KEYWORDS.each { |keyword| return :block if next_term.include?(keyword) }
-  FLOW_KEYWORDS.each { |keyword| return :flow if next_term.include?(keyword) }
+
+def keyword_type?(term)
+  ALL_KEYWORDS.each do |arr|
+    return KEYWORDS_SYMBOL[arr] if arr.any? { |keyword| term.include?(keyword)}
+  end
   nil
 end
 
