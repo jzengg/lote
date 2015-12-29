@@ -58,8 +58,8 @@ a JSON file-name and an optional output file-name as arguments.
 * Using the example files, you would run `./templater example_template.html example_data.json output.html`
 
 ## Future Features
-- [ ] testing
 - [ ] use a regex/grep or another method to avoid using ostruct
+- [ ] testing using cucumber/rspec + aruba
 - [ ] support master template file that lists other template files to read
 - [ ] partials with '\_file-name' convention
 - [ ] use Thor ?

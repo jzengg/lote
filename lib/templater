@@ -4,7 +4,7 @@ require 'json'
 require 'ostruct'
 
 arg_error_message = "Not enough arguments. Please use the following format:"
-arg_error_message += " templater.rb [template_name] [data_name] [output_file_name]"
+arg_error_message += " ./templater [template_name] [data_name] [output_file_name]"
 raise arg_error_message if ARGV.size < 2
 
 BLOCK_KEYWORDS = ["EACH"]
@@ -13,7 +13,7 @@ END_KEYWORDS = ["END"]
 ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
 KEYWORDS_SYMBOL = {
   END_KEYWORDS => :end,
-  BLOCK_KEYWORDS => :block, 
+  BLOCK_KEYWORDS => :block,
   FLOW_KEYWORDS => :flow
 }
 
