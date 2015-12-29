@@ -21,7 +21,7 @@ def parse(template, context)
   while current_term = terms.shift
     next_term = terms.first unless terms.empty?
 
-    if contains_ruby?(current_term)
+    if is_ruby_tag?(current_term)
       keyword_type = keyword_type?(next_term)
       current_term = terms.shift unless keyword_type.nil?
 
@@ -43,7 +43,7 @@ def parse(template, context)
   context.instance_eval(stringified_ruby)
 end
 
-def contains_ruby?(term)
+def is_ruby_tag?(term)
   term == "<*"
 end
 
