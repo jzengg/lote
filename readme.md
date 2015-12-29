@@ -7,16 +7,33 @@ a JSON file-name and an optional output file-name as arguments.
 * Control flow keywords `if, else, elsif, unless`
 
 ## Syntax
-* The <\* \*> tag denotes a line that contains Ruby.
-* Can index into json data like this:
+* The `<* *>` tag denotes a line that contains Ruby.
+* Given data that looks like
+```json
+{
+  "page": {
+    "title": "NBA"
+  },
+  "teams": [
+    {"name": "New York Knicks"},
+    {"name": "San Antonio Spurs"}
+  ],
+  "players": [
+    { "name": "Kawhi Leonard", "nicknames": ["The Claw"] },
+    { "name": "Draymond Green", "nicknames": ["BDD", "Dray"] }
+  ]
+}
+```
+* Inside of `<* *>`, self refers to the JSON data.
+* So you can index into json data like this:
 ```html
 <body>
-  <* player.name *>
+  <* page.title *>
 </body>
 ```
 ```html
 <body>
-  Draymond Green
+  NBA
 </body>
 ```
 * Looping through players looks like this:
@@ -36,7 +53,7 @@ a JSON file-name and an optional output file-name as arguments.
 
 ## How to use
 * Clone this repo
-* Move your template and json file into the directory
+* Move your template and json file into the lib directory
 * Cd into directory and run templater with the arguments [template_name] [data_name] [output_file_name]
 * Using the example files, you would run `./templater example_template.html example_data.json output.html`
 
@@ -45,3 +62,4 @@ a JSON file-name and an optional output file-name as arguments.
 - [ ] use a regex/grep or another method to avoid using ostruct
 - [ ] support master template file that lists other template files to read
 - [ ] partials with '\_file-name' convention
+- [ ] use Thor ?
