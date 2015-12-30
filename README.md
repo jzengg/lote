@@ -62,5 +62,6 @@ a JSON file-name and an optional output file-name as arguments.
 - [ ] use a regex/grep or another method to avoid using ostruct
 - [ ] support master template file that lists other template files to read
 - [ ] partials with '\_file-name' convention
+- [ ] testing for #run
 - [ ] more advanced testing using aruba + rspec
-- [ ] use Thor ?
+- [ ] Thor for more command-line options

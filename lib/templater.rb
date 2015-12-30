@@ -2,6 +2,14 @@
 require 'json'
 require 'ostruct'
 
+# @author Jimmy Zeng
+
+
+# This script takes in the file-name for an HTML template, JSON data, and
+# optionally a name for the output-file.
+# The files are expected to be in the same directory as the script.
+
+
 arg_message = 'Not enough arguments. Please use the following format: '
 arg_message += './templater [template_name] [data_name] [output_file_name]'
 fail arg_message if __FILE__ == $PROGRAM_NAME && ARGV.size < 2
@@ -10,6 +18,7 @@ BLOCK_KEYWORDS = ['EACH']
 FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
 END_KEYWORDS = ['END']
 ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
+
 KEYWORDS_SYMBOL = {
   END_KEYWORDS => :end,
   BLOCK_KEYWORDS => :block,
@@ -31,6 +40,13 @@ end
 def generate_html(template, context = self)
   create_proc_to_generate_html(template, context).call
 end
+
+# Generates a proc with 'instructions' to build up the 'html' string.
+# The proc returns 'html' which can then be written to an output file
+
+# @param template [string] HTML template file as a string
+# @param context [OpenStruct] JSON data converted into OpenStruct
+# @return [proc] Returns the output HTML as a string when called 
 
 def create_proc_to_generate_html(template, context)
   terms = template.split(PATTERN)
