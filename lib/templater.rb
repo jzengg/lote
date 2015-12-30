@@ -4,7 +4,7 @@ require 'ostruct'
 
 arg_message = 'Not enough arguments. Please use the following format: '
 arg_message += './templater [template_name] [data_name] [output_file_name]'
-fail arg_message if ARGV.size < 2
+fail arg_message if __FILE__ == $0 && ARGV.size < 2
 
 BLOCK_KEYWORDS = ['EACH']
 FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
@@ -28,13 +28,13 @@ def run
   puts "Successfully saved to #{output_name}"
 end
 
-def generate_html(template, context)
+def generate_html(template, context = self)
   create_proc_to_generate_html(template, context).call
 end
 
 def create_proc_to_generate_html(template, context)
   terms = template.split(PATTERN)
-  stringified_ruby = "Proc.new do |params|\n params ||= {}; html=''\n"
+  stringified_ruby = "Proc.new do |_|\n ; html=''\n"
 
   until terms.empty?
     current_term = terms.shift
@@ -78,4 +78,5 @@ def parse_block_keyword(term)
   "#{key}.#{method.downcase} do |#{param_name}|"
 end
 
-run
+
+run if __FILE__ == $0
