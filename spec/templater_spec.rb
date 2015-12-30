@@ -140,4 +140,19 @@ describe 'Templater' do
     end
 
   end
+
+  describe '#run' do
+    before(:each) { run }
+    context 'Passing in arguments from command-line' do
+      it 'reads first argument as template'
+
+      it 'reads second argument given as JSON data'
+
+      it 'writes to file-name given by third argument'
+
+      it 'defaults to output.html if only 2 arguments given'
+    end
+
+  end
+
 end
