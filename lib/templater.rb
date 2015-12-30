@@ -6,23 +6,26 @@ require 'ostruct'
 
 # This script takes in the file-name for an HTML template, JSON data, and
 # optionally a name for the output-file. It writes a new file after parsing
-# the templating language in the input HTML and using the JSON data.
+# the input HTML and using the JSON data.
 # The files are expected to be in the same directory as the script.
 
 arg_message = 'Not enough arguments. Please use the following format: '
 arg_message += './templater [template_name] [data_name] [output_file_name]'
 fail arg_message if __FILE__ == $PROGRAM_NAME && ARGV.size < 2
 
+# Arrays to check what kind of keyword a term contains
 BLOCK_KEYWORDS = ['EACH']
 FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
 END_KEYWORDS = ['END']
 ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
 
+# Maps type of keyword to a symbol representation
 KEYWORDS_SYMBOL = {
   END_KEYWORDS => :end,
   BLOCK_KEYWORDS => :block,
   FLOW_KEYWORDS => :flow }
 
+# Regex to split html for the <* tag
 PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
   # Top level method to capture the arguments passed in and write to an output
