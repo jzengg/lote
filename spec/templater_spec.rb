@@ -4,7 +4,9 @@ describe 'Templater' do
 
   describe '#generate_html' do
 
-    context 'Using <* *> with simple Ruby' do
+    context 'Using <* *> with Ruby' do
+
+      context 'Basic Ruby' do
       it 'handles empty lines' do
         template = "\n\n \n"
         expect(generate_html(template)).to eq("\n\n \n")
@@ -15,7 +17,7 @@ describe 'Templater' do
         expect(generate_html(template)).to eq("string")
       end
 
-      it 'handles Ruby with empty lines between' do
+      it 'handles extra empty lines' do
         template = "\n <* 2+2 *> \n \n <html> \n </html>"
         expect(generate_html(template)).to eq("\n 4 \n \n <html> \n </html>")
       end
@@ -24,8 +26,28 @@ describe 'Templater' do
         template = "<*2+1*>"
         expect(generate_html(template)).to eq("3")
       end
+    end
 
-  end
+    context 'Looping constructs' do
+      it 'handles array literals' do
+        template = "<* EACH [1,2,3] num *>\n"
+        template += "<* num *>\n"
+        template += "<* ENDEACH *>"
+
+        expect(generate_html(template)).to eq("\n1\n\n2\n\n3\n")
+      end
+
+      # can probably fix with a regex in #parse_block_keyword
+      it 'handles array literals with no space between elements' do
+        template = "<* EACH [1, 2, 3] num *>\n"
+        template += "<* num *>\n"
+        template += "<* ENDEACH *>"
+
+        expect(generate_html(template)).to eq("\n1\n\n2\n\n3\n")
+      end
+
+    end
+
 
     context 'Flow control' do
       it 'handles single if' do
@@ -57,8 +79,9 @@ describe 'Templater' do
       end
     end
 
+  end
 
-    context 'JSON data' do
+    context 'Using JSON data' do
       let (:data) do
         json = {
           title: "Testing",
@@ -89,7 +112,8 @@ describe 'Templater' do
 
       end
 
-      context 'Looping construct using each' do
+      context 'Looping through data' do
+
         it 'handles a simple loop' do
           template = "<* EACH people person *>\n"
           template += "<* person.name *>\n"

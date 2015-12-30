@@ -4,7 +4,7 @@ require 'ostruct'
 
 arg_message = 'Not enough arguments. Please use the following format: '
 arg_message += './templater [template_name] [data_name] [output_file_name]'
-fail arg_message if __FILE__ == $0 && ARGV.size < 2
+fail arg_message if __FILE__ == $PROGRAM_NAME && ARGV.size < 2
 
 BLOCK_KEYWORDS = ['EACH']
 FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
@@ -78,5 +78,4 @@ def parse_block_keyword(term)
   "#{key}.#{method.downcase} do |#{param_name}|"
 end
 
-
-run if __FILE__ == $0
+run if __FILE__ == $PROGRAM_NAME
