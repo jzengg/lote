@@ -4,7 +4,7 @@ a JSON file-name and an optional output file-name as arguments.
 
 ## Supports
 * Nested looping constructs using `each`
-* Control flow keywords `if, else, elsif, unless`
+* Flow control keywords `if, else, elsif, unless`
 
 ## Syntax
 * The `<* *>` tag denotes a line that contains Ruby.

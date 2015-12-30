@@ -2,26 +2,29 @@
 require 'json'
 require 'ostruct'
 
-arg_error_message = "Not enough arguments. Please use the following format:"
-arg_error_message += " ./templater [template_name] [data_name] [output_file_name]"
-raise arg_error_message if ARGV.size < 2
+arg_message = 'Not enough arguments. Please use the following format: '
+arg_message += './templater [template_name] [data_name] [output_file_name]'
+fail arg_message if ARGV.size < 2
 
-BLOCK_KEYWORDS = ["EACH"]
-FLOW_KEYWORDS = ["IF", "UNLESS", "ELSE", "ELSIF"]
-END_KEYWORDS = ["END"]
+BLOCK_KEYWORDS = ['EACH']
+FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
+END_KEYWORDS = ['END']
 ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
-KEYWORDS_SYMBOL = {END_KEYWORDS => :end, BLOCK_KEYWORDS => :block, FLOW_KEYWORDS => :flow}
+KEYWORDS_SYMBOL = {
+  END_KEYWORDS => :end,
+  BLOCK_KEYWORDS => :block,
+  FLOW_KEYWORDS => :flow }
 
 PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
 def run
   template_name, data_name, output_name = ARGV
-  output_name ||= "output.html"
+  output_name ||= 'output.html'
 
   data_object = JSON.parse(IO.read(data_name), object_class: OpenStruct)
   output_html = generate_html(IO.read(template_name), data_object)
 
-  File.open(output_name, 'w') {|file| file.puts output_html}
+  File.open(output_name, 'w') { |file| file.puts output_html }
   puts "Successfully saved to #{output_name}"
 end
 
@@ -33,10 +36,11 @@ def create_proc_to_generate_html(template, context)
   terms = template.split(PATTERN)
   stringified_ruby = "Proc.new do |params|\n params ||= {}; html=''\n"
 
-  while current_term = terms.shift
+  until terms.empty?
+    current_term = terms.shift
     next_term = terms.first unless terms.empty?
 
-    if is_ruby_tag?(current_term)
+    if ruby_tag?(current_term)
       keyword_type = keyword_type?(next_term)
       current_term = terms.shift unless keyword_type.nil?
 
@@ -54,23 +58,23 @@ def create_proc_to_generate_html(template, context)
     end
   end
 
-  stringified_ruby << "html; end"
+  stringified_ruby << 'html; end'
   context.instance_eval(stringified_ruby)
 end
 
-def is_ruby_tag?(term)
-  term == "<*"
+def ruby_tag?(term)
+  term == '<*'
 end
 
 def keyword_type?(term)
   ALL_KEYWORDS.each do |arr|
-    return KEYWORDS_SYMBOL[arr] if arr.any? { |keyword| term.include?(keyword)}
+    return KEYWORDS_SYMBOL[arr] if arr.any? { |keyword| term.include?(keyword) }
   end
   nil
 end
 
 def parse_block_keyword(term)
-  method, key, param_name = term.split(" ")
+  method, key, param_name = term.split(' ')
   "#{key}.#{method.downcase} do |#{param_name}|"
 end
 

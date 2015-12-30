@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'thor'
+gem 'yard'
+gem 'rubocop', require: false
