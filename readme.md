@@ -55,11 +55,12 @@ a JSON file-name and an optional output file-name as arguments.
 * Clone this repo
 * Move your template and json file into the lib directory
 * cd into directory and run templater with the arguments [template_name] [data_name] [output_file_name]
-* Using the example files, you would run `./templater example_template.html example_data.json output.html`
+* Using the example files, you would run `./templater.rb example_template.html example_data.json output.html`
 
 ## Todo
+- [x] basic testing
 - [ ] use a regex/grep or another method to avoid using ostruct
-- [ ] testing using cucumber/rspec + aruba
 - [ ] support master template file that lists other template files to read
 - [ ] partials with '\_file-name' convention
+- [ ] more advanced testing using aruba + rspec
 - [ ] use Thor ?
