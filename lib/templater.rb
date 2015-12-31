@@ -3,7 +3,7 @@ require 'json'
 require 'ostruct'
 
 # @author Jimmy Zeng
-
+#
 # This script takes in the file-name for an HTML template, JSON data, and
 # optionally a name for the output-file. It writes a new file after parsing
 # the input HTML and using the JSON data.
@@ -25,17 +25,19 @@ KEYWORDS_SYMBOL = {
   BLOCK_KEYWORDS => :block,
   FLOW_KEYWORDS => :flow }
 
-# Regex to split html for the <* tag
+# Regex to split html for the <* tag. A space between the tag and the
+# Ruby is optional.
 PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
   # Top level method to capture the arguments passed in and write to an output
   # html file.
-  #
 
   def run
     template_name, data_name, output_name = ARGV
     output_name ||= 'output.html'
 
+    # Use Open Struct instead of default Hash to allow dot notation to be used
+    # in template file
     data_object = JSON.parse(IO.read(data_name), object_class: OpenStruct)
     output_html = generate_html(IO.read(template_name), data_object)
 
@@ -67,16 +69,17 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
     # @example terms = ["<html>\n", "<*", "1+2", "</html>\n"]
 
     until terms.empty?
-      # Go through the terms looking for the <* tag
+      # Go through the terms looking for the <* tag.
       current_term = terms.shift
       next_term = terms.first unless terms.empty?
 
       if ruby_tag?(current_term)
-        # Once we find a Ruby tag, we check if the following term is a keyword
-        # which won't be printed ex. 'if.' Similar to <% vs <%= in ERB
+        # Once we find a Ruby tag, we check what kind of keyword the next term
+        # contains. We'll shift the current_term if the keyword does not need
+        # to be printed like 'if'. Similar to <% vs <%= in ERB
         keyword_type = keyword_type?(next_term)
         current_term = terms.shift unless keyword_type.nil?
-
+        
         # Based on the type of keyword the next term contains, we add the
         # correct string to our stringified proc 'stringified_ruby'
         case keyword_type
@@ -89,6 +92,8 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
         end
 
       else
+        # If the term does not contain the <* tag, then it is presumably plain
+        # html and we add a line in the proc to insert it into the string
         stringified_ruby << "html << #{current_term.inspect}\n"
       end
     end
@@ -113,6 +118,7 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
   def keyword_type?(term)
     ALL_KEYWORDS.each do |arr|
+      # Check each set of keywords to see what kind of keyword a term contains
       return KEYWORDS_SYMBOL[arr] if arr.any? { |keyword| term.include?(keyword) }
     end
     nil
