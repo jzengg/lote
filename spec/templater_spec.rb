@@ -38,7 +38,7 @@ describe 'Templater' do
       end
 
       # can probably fix with a regex in #parse_block_keyword
-      it 'handles array literals with no space between elements' do
+      it 'handles array literals with a space between elements' do
         template = "<* EACH [1, 2, 3] num *>\n"
         template += "<* num *>\n"
         template += "<* ENDEACH *>"
