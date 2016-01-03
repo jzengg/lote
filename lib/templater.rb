@@ -8,22 +8,22 @@ require 'ostruct'
 # optionally a name for the output-file. It writes a new file after parsing
 # the input HTML using the JSON data as needed.
 # The template and data files should be in the same directory as the script.
+#
+class Templater
+  BLOCK_KEYWORDS = ['EACH']
+  FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
+  END_KEYWORDS = ['END']
+  ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
 
-# Arrays to check what kind of keyword a term contains
-BLOCK_KEYWORDS = ['EACH']
-FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
-END_KEYWORDS = ['END']
-ALL_KEYWORDS = [END_KEYWORDS, BLOCK_KEYWORDS, FLOW_KEYWORDS]
+  # Maps type of keyword to a symbol representation
+  KEYWORDS_SYMBOL = {
+    END_KEYWORDS => :end,
+    BLOCK_KEYWORDS => :block,
+    FLOW_KEYWORDS => :flow }
 
-# Maps type of keyword to a symbol representation
-KEYWORDS_SYMBOL = {
-  END_KEYWORDS => :end,
-  BLOCK_KEYWORDS => :block,
-  FLOW_KEYWORDS => :flow }
-
-# Regex to split html for the <* tag. A space between the tag and the
-# Ruby is optional.
-PATTERN = /(<\*)\s*(.*?)\s*\*>/
+  # Regex to split html for the <* tag. A space between the tag and the
+  # Ruby is optional.
+  PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
   # Top level method to capture the arguments passed in and write to an output
   # html file.
@@ -64,11 +64,11 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
   # @param context [OpenStruct] JSON data converted into OpenStruct
   # @return [proc] Returns the output HTML as a string when called
   def create_proc_to_generate_html(template, context)
-    terms = template.split(PATTERN)
-    stringified_ruby = "Proc.new do |_|\n ; html=''\n"
-
-    # Splits the template up, according to the special tag denoting Ruby <*
+    # Splits the template up, according to the special tag denoting Ruby '<*'
     # @example terms = ["<html>\n", "<*", "1+2", "</html>\n"]
+    terms = template.split(PATTERN)
+    # The base for the stringified proc which will be evaluated
+    stringified_ruby = "Proc.new do |_|\n ; html=''\n"
 
     until terms.empty?
       # Go through the terms looking for the <* tag.
@@ -77,11 +77,11 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
       if ruby_tag?(current_term)
         # Once we find a Ruby tag, we check what kind of keyword the next term
-        # contains. Then we shift our current term to the content of the <* tag
+        # contains. Then we reassign current_term to the contents of the tag
         keyword_type = keyword_type?(next_term)
         current_term = terms.shift
 
-        # Based on the type of keyword the next term contains, we add the
+        # Based on the type of keyword the current term contains, we add the
         # correct string to our stringified proc 'stringified_ruby'
         case keyword_type
         when :end then stringified_ruby << "end\n"
@@ -89,6 +89,7 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
           parsed_line = parse_block_keyword(current_term)
           stringified_ruby << "#{parsed_line}\n"
         when :flow then stringified_ruby << "#{current_term.downcase}\n"
+        # if no special keyword, then just insert the interpolated Ruby
         else stringified_ruby << "html << (#{current_term}).to_s\n"
         end
 
@@ -100,6 +101,7 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
     end
     # Our final line in the proc is to return the html we've built up
     stringified_ruby << 'html; end'
+    # Evaluate the stringified proc using the OpenStruct json as the context
     context.instance_eval(stringified_ruby)
   end
 
@@ -132,4 +134,6 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
     "#{key}.#{method.downcase} do |#{param_name}|"
   end
 
-run if __FILE__ == $PROGRAM_NAME
+end
+
+Templater.new.run if __FILE__ == $PROGRAM_NAME

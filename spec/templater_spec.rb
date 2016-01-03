@@ -1,30 +1,30 @@
 require 'templater'
 
-describe 'Templater' do
+describe Templater do
 
   describe '#generate_html' do
-
+    let(:templater) { Templater.new }
     context 'Using <* *> with Ruby' do
 
       context 'Basic Ruby' do
       it 'handles empty lines' do
         template = "\n\n \n"
-        expect(generate_html(template)).to eq("\n\n \n")
+        expect(templater.generate_html(template)).to eq("\n\n \n")
       end
 
       it 'handles Ruby strings' do
         template = "<* 'string' *>"
-        expect(generate_html(template)).to eq("string")
+        expect(templater.generate_html(template)).to eq("string")
       end
 
       it 'handles extra empty lines' do
         template = "\n <* 2+2 *> \n \n <html> \n </html>"
-        expect(generate_html(template)).to eq("\n 4 \n \n <html> \n </html>")
+        expect(templater.generate_html(template)).to eq("\n 4 \n \n <html> \n </html>")
       end
 
       it 'handles no space between tag and Ruby' do
         template = "<*2+1*>"
-        expect(generate_html(template)).to eq("3")
+        expect(templater.generate_html(template)).to eq("3")
       end
     end
 
@@ -34,7 +34,7 @@ describe 'Templater' do
         template += "<* num *>\n"
         template += "<* ENDEACH *>"
 
-        expect(generate_html(template)).to eq("\n1\n\n2\n\n3\n")
+        expect(templater.generate_html(template)).to eq("\n1\n\n2\n\n3\n")
       end
 
       # can probably fix with a regex in #parse_block_keyword
@@ -43,16 +43,15 @@ describe 'Templater' do
         template += "<* num *>\n"
         template += "<* ENDEACH *>"
 
-        expect(generate_html(template)).to eq("\n1\n\n2\n\n3\n")
+        expect(templater.generate_html(template)).to eq("\n1\n\n2\n\n3\n")
       end
 
     end
 
-
     context 'Flow control' do
       it 'handles single if' do
         template = "<* IF 2 > 1 *>\n<p> 2 is greater than 1 </p>\n<* END *>"
-        expect(generate_html(template)).to eq("\n<p> 2 is greater than 1 </p>\n")
+        expect(templater.generate_html(template)).to eq("\n<p> 2 is greater than 1 </p>\n")
       end
 
       it 'handles multiple branch if' do
@@ -65,7 +64,7 @@ describe 'Templater' do
 
         expected_output = "\n<p> 2 is greater than 1 </p>\n"
 
-        expect(generate_html(template)).to eq(expected_output)
+        expect(templater.generate_html(template)).to eq(expected_output)
       end
 
       it 'handles unless' do
@@ -75,7 +74,7 @@ describe 'Templater' do
 
         expected_output = "\n<p> 2 is a positive integer </p>\n"
 
-        expect(generate_html(template)).to eq(expected_output)
+        expect(templater.generate_html(template)).to eq(expected_output)
       end
     end
 
@@ -97,17 +96,17 @@ describe 'Templater' do
 
         it 'within <* *> tags, self is the JSON data' do
           template = "<* self *>"
-          expect(generate_html(template, data)).to eq(data.inspect)
+          expect(templater.generate_html(template, data)).to eq(data.inspect)
         end
 
         it 'can access top level keys' do
           template = "<* title *>"
-          expect(generate_html(template, data)).to eq("Testing")
+          expect(templater.generate_html(template, data)).to eq("Testing")
         end
 
         it 'can access nested keys' do
           template = "<* people.first.name *>"
-          expect(generate_html(template, data)).to eq("Jason")
+          expect(templater.generate_html(template, data)).to eq("Jason")
         end
 
       end
@@ -120,7 +119,7 @@ describe 'Templater' do
           template += "<* ENDEACH *>"
 
           expected_output = "\nJason\n\nJake\n"
-          expect(generate_html(template, data)).to eq(expected_output)
+          expect(templater.generate_html(template, data)).to eq(expected_output)
         end
 
         it 'handles a nested loop' do
@@ -133,7 +132,7 @@ describe 'Templater' do
 
           expected_output = "\n<h1> Jason </h1>\n\n<p> J </p>\n\n<p> JACE </p>\n"
           expected_output += "\n\n<h1> Jake </h1>\n\n<p> JAKESTER </p>\n\n"
-          expect(generate_html(template, data)).to eq(expected_output)
+          expect(templater.generate_html(template, data)).to eq(expected_output)
         end
       end
 
