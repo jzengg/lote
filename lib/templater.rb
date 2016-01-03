@@ -6,12 +6,8 @@ require 'ostruct'
 #
 # This script takes in the file-name for an HTML template, JSON data, and
 # optionally a name for the output-file. It writes a new file after parsing
-# the input HTML and using the JSON data.
-# The files are expected to be in the same directory as the script.
-
-arg_message = 'Not enough arguments. Please use the following format: '
-arg_message += './templater [template_name] [data_name] [output_file_name]'
-fail arg_message if __FILE__ == $PROGRAM_NAME && ARGV.size < 2
+# the input HTML using the JSON data as needed.
+# The template and data files should be in the same directory as the script.
 
 # Arrays to check what kind of keyword a term contains
 BLOCK_KEYWORDS = ['EACH']
@@ -31,13 +27,14 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
   # Top level method to capture the arguments passed in and write to an output
   # html file.
+  def run(args = ARGV)
+    check_min_args
 
-  def run
-    template_name, data_name, output_name = ARGV
+    template_name, data_name, output_name = args
     output_name ||= 'output.html'
 
-    # Use Open Struct instead of default Hash to allow dot notation to be used
-    # in template file
+    # Use Open Struct instead of default Hash to accomodate dot notation in the
+    # template file
     data_object = JSON.parse(IO.read(data_name), object_class: OpenStruct)
     output_html = generate_html(IO.read(template_name), data_object)
 
@@ -45,12 +42,18 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
     puts "Successfully saved to #{output_name}"
   end
 
+  # Basic check that a minimum number of arguments is given
+  def check_min_args
+    arg_message = 'Not enough arguments. Please use the following format: '
+    arg_message += './templater.rb [template_name] [data_name] [output_file_name]'
+    fail arg_message if __FILE__ == $PROGRAM_NAME && ARGV.size < 2
+  end
+
   # Generates html using a given template string and data object
   #
   # @param template [string] HTML template file as a string
   # @param context [OpenStruct] JSON data converted into OpenStruct
   # @return [string] output HTML ready to be written to a file
-
   def generate_html(template, context = self)
     create_proc_to_generate_html(template, context).call
   end
@@ -60,7 +63,6 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
   # @param template [string] HTML template file as a string
   # @param context [OpenStruct] JSON data converted into OpenStruct
   # @return [proc] Returns the output HTML as a string when called
-
   def create_proc_to_generate_html(template, context)
     terms = template.split(PATTERN)
     stringified_ruby = "Proc.new do |_|\n ; html=''\n"
@@ -79,7 +81,7 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
         # to be printed like 'if'. Similar to <% vs <%= in ERB
         keyword_type = keyword_type?(next_term)
         current_term = terms.shift unless keyword_type.nil?
-        
+
         # Based on the type of keyword the next term contains, we add the
         # correct string to our stringified proc 'stringified_ruby'
         case keyword_type
@@ -106,7 +108,6 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
   #
   # @param term [string] A piece of the template html passed in
   # @return [boolean]
-
   def ruby_tag?(term)
     term == '<*'
   end
@@ -115,7 +116,6 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
   #
   # @param term [string] A piece of the template html passed in
   # @return [symbol, nil] The type of keyword present in the term.
-
   def keyword_type?(term)
     ALL_KEYWORDS.each do |arr|
       # Check each set of keywords to see what kind of keyword a term contains
@@ -128,7 +128,6 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
   #
   # @param term [string] A piece of the template html passed in
   # @return [string] Stringified Ruby which can be evaluated using instance_eval
-
   def parse_block_keyword(term)
     method, key, param_name = term.split(' ')
     "#{key}.#{method.downcase} do |#{param_name}|"
