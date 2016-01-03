@@ -27,10 +27,10 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
   # Top level method to capture the arguments passed in and write to an output
   # html file.
-  def run(args = ARGV)
+  def run
     check_min_args
 
-    template_name, data_name, output_name = args
+    template_name, data_name, output_name = ARGV
     output_name ||= 'output.html'
 
     # Use Open Struct instead of default Hash to accomodate dot notation in the
@@ -42,11 +42,11 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
     puts "Successfully saved to #{output_name}"
   end
 
-  # Basic check that a minimum number of arguments is given
+  # Basic check to make sure a minimum number of arguments is given
   def check_min_args
     arg_message = 'Not enough arguments. Please use the following format: '
     arg_message += './templater.rb [template_name] [data_name] [output_file_name]'
-    fail arg_message if __FILE__ == $PROGRAM_NAME && ARGV.size < 2
+    fail arg_message if ARGV.size < 2
   end
 
   # Generates html using a given template string and data object
@@ -77,10 +77,9 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
       if ruby_tag?(current_term)
         # Once we find a Ruby tag, we check what kind of keyword the next term
-        # contains. We'll shift the current_term if the keyword does not need
-        # to be printed like 'if'. Similar to <% vs <%= in ERB
+        # contains. Then we shift our current term to the content of the <* tag
         keyword_type = keyword_type?(next_term)
-        current_term = terms.shift unless keyword_type.nil?
+        current_term = terms.shift
 
         # Based on the type of keyword the next term contains, we add the
         # correct string to our stringified proc 'stringified_ruby'
@@ -90,7 +89,7 @@ PATTERN = /(<\*)\s*(.*?)\s*\*>/
           parsed_line = parse_block_keyword(current_term)
           stringified_ruby << "#{parsed_line}\n"
         when :flow then stringified_ruby << "#{current_term.downcase}\n"
-        else stringified_ruby << "html << (#{terms.shift}).to_s\n"
+        else stringified_ruby << "html << (#{current_term}).to_s\n"
         end
 
       else

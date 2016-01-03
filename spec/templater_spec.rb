@@ -142,7 +142,7 @@ describe 'Templater' do
   end
 
   describe '#run' do
-    before(:each) { run }
+
     context 'Passing in arguments from command-line' do
       it 'reads first argument as template'
 
