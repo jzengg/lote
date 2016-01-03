@@ -1,7 +1,6 @@
 # lote
 A very simple command-line templating engine in Ruby. Takes a template file-name,
-a JSON file-name and an optional output file-name as arguments. More
-documentation available in doc/index.html
+a JSON file-name and an optional output file-name as arguments. Documented using YARD and tested with RSpec.
 
 ## Supports
 * Nested looping constructs using `each`
@@ -60,9 +59,8 @@ documentation available in doc/index.html
 
 ## Todo
 - [x] basic testing
-- [ ] use a regex/grep or another method to avoid using ostruct
+- [ ] explore alternatives to using ostruct
 - [ ] support master template file that lists other template files to read
 - [ ] partials with '\_file-name' convention
 - [ ] testing for #run
-- [ ] more advanced testing using aruba + rspec
 - [ ] Thor for more command-line options
