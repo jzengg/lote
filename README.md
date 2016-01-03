@@ -1,6 +1,7 @@
 # lote
 A very simple command-line templating engine in Ruby. Takes a template file-name,
-a JSON file-name and an optional output file-name as arguments.
+a JSON file-name and an optional output file-name as arguments. More
+documentation available in doc/index.html
 
 ## Supports
 * Nested looping constructs using `each`
