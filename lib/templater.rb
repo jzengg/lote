@@ -33,8 +33,8 @@ class Templater
     template_name, data_name, output_name = ARGV
     output_name ||= 'output.html'
 
-    # Use Open Struct instead of default Hash to accomodate dot notation in the
-    # template file
+    # Use OpenStruct instead of the Hash default to accomodate dot notation in
+    # the template file
     data_object = JSON.parse(IO.read(data_name), object_class: OpenStruct)
     output_html = generate_html(IO.read(template_name), data_object)
 
@@ -45,7 +45,7 @@ class Templater
   # Basic check to make sure a minimum number of arguments is given
   def check_min_args
     arg_message = 'Not enough arguments. Please use the following format: '
-    arg_message += './templater.rb [template_name] [data_name] [output_file_name]'
+    arg_message += './templater.rb [template_name] [data_name] [output_name]'
     fail arg_message if ARGV.size < 2
   end
 
@@ -64,8 +64,7 @@ class Templater
   # @param context [OpenStruct] JSON data converted into OpenStruct
   # @return [proc] Returns the output HTML as a string when called
   def create_proc_to_generate_html(template, context)
-    # Splits the template up, according to the special tag denoting Ruby '<*'
-    # @example terms = ["<html>\n", "<*", "1+2", "</html>\n"]
+    # Example: terms = ["<html>\n", "<*", "1+2", "</html>\n"]
     terms = template.split(PATTERN)
     # The base for the stringified proc which will be evaluated
     stringified_ruby = "Proc.new do |_|\n ; html=''\n"
@@ -77,12 +76,12 @@ class Templater
 
       if ruby_tag?(current_term)
         # Once we find a Ruby tag, we check what kind of keyword the next term
-        # contains. Then we reassign current_term to the contents of the tag
+        # contains and reassign current_term to the contents of the tag.
         keyword_type = keyword_type?(next_term)
         current_term = terms.shift
 
-        # Based on the type of keyword the current term contains, we add the
-        # correct string to our stringified proc 'stringified_ruby'
+        # We add the correct string to 'stringified_ruby' based on the type of
+        # keyword.
         case keyword_type
         when :end then stringified_ruby << "end\n"
         when :block
@@ -93,9 +92,9 @@ class Templater
         else stringified_ruby << "html << (#{current_term}).to_s\n"
         end
 
+      # If the term does not contain the <* tag, then it is presumably plain
+      # html and we add a line in the proc to insert it into the string
       else
-        # If the term does not contain the <* tag, then it is presumably plain
-        # html and we add a line in the proc to insert it into the string
         stringified_ruby << "html << #{current_term.inspect}\n"
       end
     end

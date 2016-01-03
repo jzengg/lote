@@ -422,7 +422,7 @@ html file.</p>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_check_min_args'>check_min_args</span>
   <span class='id identifier rubyid_arg_message'>arg_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Not enough arguments. Please use the following format: </span><span class='tstring_end'>&#39;</span></span>
-  <span class='id identifier rubyid_arg_message'>arg_message</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>./templater.rb [template_name] [data_name] [output_file_name]</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_arg_message'>arg_message</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>./templater.rb [template_name] [data_name] [output_name]</span><span class='tstring_end'>&#39;</span></span>
   <span class='id identifier rubyid_fail'>fail</span> <span class='id identifier rubyid_arg_message'>arg_message</span> <span class='kw'>if</span> <span class='const'>ARGV</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>&lt;</span> <span class='int'>2</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -549,15 +549,13 @@ html file.</p>
 102
 103
 104
-105
-106</pre>
+105</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/templater.rb', line 66</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create_proc_to_generate_html'>create_proc_to_generate_html</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
-  <span class='comment'># Splits the template up, according to the special tag denoting Ruby &#39;&lt;*&#39;
-</span>  <span class='comment'># @example terms = [&quot;&lt;html&gt;\n&quot;, &quot;&lt;*&quot;, &quot;1+2&quot;, &quot;&lt;/html&gt;\n&quot;]
+  <span class='comment'># Example: terms = [&quot;&lt;html&gt;\n&quot;, &quot;&lt;*&quot;, &quot;1+2&quot;, &quot;&lt;/html&gt;\n&quot;]
 </span>  <span class='id identifier rubyid_terms'>terms</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='const'>PATTERN</span><span class='rparen'>)</span>
   <span class='comment'># The base for the stringified proc which will be evaluated
 </span>  <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Proc.new do |_|\n ; html=&#39;&#39;\n</span><span class='tstring_end'>&quot;</span></span>
@@ -569,12 +567,12 @@ html file.</p>
 
     <span class='kw'>if</span> <span class='id identifier rubyid_ruby_tag?'>ruby_tag?</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
       <span class='comment'># Once we find a Ruby tag, we check what kind of keyword the next term
-</span>      <span class='comment'># contains. Then we reassign current_term to the contents of the tag
+</span>      <span class='comment'># contains and reassign current_term to the contents of the tag.
 </span>      <span class='id identifier rubyid_keyword_type'>keyword_type</span> <span class='op'>=</span> <span class='id identifier rubyid_keyword_type?'>keyword_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_next_term'>next_term</span><span class='rparen'>)</span>
       <span class='id identifier rubyid_current_term'>current_term</span> <span class='op'>=</span> <span class='id identifier rubyid_terms'>terms</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span>
 
-      <span class='comment'># Based on the type of keyword the current term contains, we add the
-</span>      <span class='comment'># correct string to our stringified proc &#39;stringified_ruby&#39;
+      <span class='comment'># We add the correct string to &#39;stringified_ruby&#39; based on the type of
+</span>      <span class='comment'># keyword.
 </span>      <span class='kw'>case</span> <span class='id identifier rubyid_keyword_type'>keyword_type</span>
       <span class='kw'>when</span> <span class='symbol'>:end</span> <span class='kw'>then</span> <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>end\n</span><span class='tstring_end'>&quot;</span></span>
       <span class='kw'>when</span> <span class='symbol'>:block</span>
@@ -762,16 +760,16 @@ html file.</p>
       <pre class="lines">
 
 
+119
 120
 121
 122
 123
 124
-125
-126</pre>
+125</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 119</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_keyword_type?'>keyword_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='const'>ALL_KEYWORDS</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_arr'>arr</span><span class='op'>|</span>
@@ -849,13 +847,13 @@ html file.</p>
       <pre class="lines">
 
 
+131
 132
 133
-134
-135</pre>
+134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 131</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_block_keyword'>parse_block_keyword</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_param_name'>param_name</span> <span class='op'>=</span> <span class='id identifier rubyid_term'>term</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
@@ -925,12 +923,12 @@ html file.</p>
       <pre class="lines">
 
 
+111
 112
-113
-114</pre>
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 111</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruby_tag?'>ruby_tag?</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_term'>term</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;*</span><span class='tstring_end'>&#39;</span></span>
@@ -991,8 +989,8 @@ html file.</p>
   <span class='id identifier rubyid_template_name'>template_name</span><span class='comma'>,</span> <span class='id identifier rubyid_data_name'>data_name</span><span class='comma'>,</span> <span class='id identifier rubyid_output_name'>output_name</span> <span class='op'>=</span> <span class='const'>ARGV</span>
   <span class='id identifier rubyid_output_name'>output_name</span> <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>output.html</span><span class='tstring_end'>&#39;</span></span>
 
-  <span class='comment'># Use Open Struct instead of default Hash to accomodate dot notation in the
-</span>  <span class='comment'># template file
+  <span class='comment'># Use OpenStruct instead of the Hash default to accomodate dot notation in
+</span>  <span class='comment'># the template file
 </span>  <span class='id identifier rubyid_data_object'>data_object</span> <span class='op'>=</span> <span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='const'>IO</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_data_name'>data_name</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>object_class:</span> <span class='const'>OpenStruct</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_output_html'>output_html</span> <span class='op'>=</span> <span class='id identifier rubyid_generate_html'>generate_html</span><span class='lparen'>(</span><span class='const'>IO</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_template_name'>template_name</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_data_object'>data_object</span><span class='rparen'>)</span>
 
@@ -1009,7 +1007,7 @@ html file.</p>
 </div>
 
     <div id="footer">
-  Generated on Sun Jan  3 16:02:54 2016 by
+  Generated on Sun Jan  3 16:35:17 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.1.2).
 </div>
