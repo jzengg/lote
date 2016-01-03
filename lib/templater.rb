@@ -6,9 +6,9 @@ require 'ostruct'
 #
 # This script takes in the file-name for an HTML template, JSON data, and
 # optionally a name for the output-file. It writes a new file after parsing
-# the input HTML using the JSON data as needed.
+# the input HTML using the JSON data and evaluating Ruby as needed.
 # The template and data files should be in the same directory as the script.
-#
+
 class Templater
   BLOCK_KEYWORDS = ['EACH']
   FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
@@ -21,7 +21,7 @@ class Templater
     BLOCK_KEYWORDS => :block,
     FLOW_KEYWORDS => :flow }
 
-  # Regex to split html for the <* tag. A space between the tag and the
+  # Regex to split html for the '<*' tag. A space between the tag and the
   # Ruby is optional.
   PATTERN = /(<\*)\s*(.*?)\s*\*>/
 
@@ -62,7 +62,7 @@ class Templater
   #
   # @param template [string] HTML template file as a string
   # @param context [OpenStruct] JSON data converted into OpenStruct
-  # @return [proc] Returns the output HTML as a string when called
+  # @return [proc] Proc that returns the output HTML as a string when called
   def create_proc_to_generate_html(template, context)
     # Example: terms = ["<html>\n", "<*", "1+2", "</html>\n"]
     terms = template.split(PATTERN)
