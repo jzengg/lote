@@ -330,6 +330,31 @@ and the Ruby is optional.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#parse_term-instance_method" title="#parse_term (instance method)">- (string) <strong>parse_term</strong>(current_term) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the appropriate string to add to stringified_ruby based on the
+contents of the tag passed in.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#ruby_tag%3F-instance_method" title="#ruby_tag? (instance method)">- (boolean) <strong>ruby_tag?</strong>(term) </a>
     
 
@@ -411,14 +436,14 @@ html file.</p>
       <pre class="lines">
 
 
+44
+45
 46
 47
-48
-49
-50</pre>
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 44</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_check_min_args'>check_min_args</span>
   <span class='id identifier rubyid_arg_message'>arg_message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Not enough arguments. Please use the following format: </span><span class='tstring_end'>&#39;</span></span>
@@ -510,6 +535,8 @@ html file.</p>
       <pre class="lines">
 
 
+64
+65
 66
 67
 68
@@ -532,55 +559,25 @@ html file.</p>
 85
 86
 87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104</pre>
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 64</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_create_proc_to_generate_html'>create_proc_to_generate_html</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span>
-  <span class='comment'># Example: terms = [&quot;&lt;html&gt;\n&quot;, &quot;&lt;*&quot;, &quot;1+2&quot;, &quot;&lt;/html&gt;\n&quot;]
-</span>  <span class='id identifier rubyid_terms'>terms</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='const'>PATTERN</span><span class='rparen'>)</span>
+  <span class='comment'># Example: terms = [&quot;&lt;html&gt;\n&quot;, &quot;1+2&quot;, &quot;&lt;*&quot;, &quot;&lt;/html&gt;\n&quot;]
+</span>  <span class='id identifier rubyid_terms'>terms</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='const'>PATTERN</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span>
   <span class='comment'># The base for the stringified proc which will be evaluated
 </span>  <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Proc.new do |_|\n ; html=&#39;&#39;\n</span><span class='tstring_end'>&quot;</span></span>
 
   <span class='kw'>until</span> <span class='id identifier rubyid_terms'>terms</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
     <span class='comment'># Go through the terms looking for the &lt;* tag.
-</span>    <span class='id identifier rubyid_current_term'>current_term</span> <span class='op'>=</span> <span class='id identifier rubyid_terms'>terms</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span>
-
+</span>    <span class='id identifier rubyid_current_term'>current_term</span> <span class='op'>=</span> <span class='id identifier rubyid_terms'>terms</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span>
     <span class='kw'>if</span> <span class='id identifier rubyid_ruby_tag?'>ruby_tag?</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
-      <span class='comment'># Once we find a Ruby tag, we reassign current_term to the contents of
-</span>      <span class='comment'># the tag and check what kind of keyterm it contains.
-</span>      <span class='id identifier rubyid_current_term'>current_term</span> <span class='op'>=</span> <span class='id identifier rubyid_terms'>terms</span><span class='period'>.</span><span class='id identifier rubyid_shift'>shift</span>
-      <span class='id identifier rubyid_keyword_type'>keyword_type</span> <span class='op'>=</span> <span class='id identifier rubyid_keyword_type?'>keyword_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
-
-      <span class='comment'># We add the correct string to &#39;stringified_ruby&#39; based on the type of
-</span>      <span class='comment'># keyword.
-</span>      <span class='kw'>case</span> <span class='id identifier rubyid_keyword_type'>keyword_type</span>
-      <span class='kw'>when</span> <span class='symbol'>:end</span> <span class='kw'>then</span> <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>end\n</span><span class='tstring_end'>&quot;</span></span>
-      <span class='kw'>when</span> <span class='symbol'>:block</span>
-        <span class='id identifier rubyid_parsed_line'>parsed_line</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_block_keyword'>parse_block_keyword</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
-        <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_parsed_line'>parsed_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
-      <span class='kw'>when</span> <span class='symbol'>:flow</span> <span class='kw'>then</span> <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_current_term'>current_term</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
-      <span class='comment'># if no special keyword, then just insert the interpolated Ruby
-</span>      <span class='kw'>else</span> <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>html &lt;&lt; (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_current_term'>current_term</span><span class='embexpr_end'>}</span><span class='tstring_content'>).to_s\n</span><span class='tstring_end'>&quot;</span></span>
-      <span class='kw'>end</span>
-
+      <span class='comment'># If we find a Ruby tag, we reassign current_term to the contents of
+</span>      <span class='comment'># the tag and add the appropriate line to our proc
+</span>      <span class='id identifier rubyid_current_term'>current_term</span> <span class='op'>=</span> <span class='id identifier rubyid_terms'>terms</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span>
+      <span class='id identifier rubyid_stringified_ruby'>stringified_ruby</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_parse_term'>parse_term</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
     <span class='comment'># If the term does not contain the &lt;* tag, then it is presumably plain
 </span>    <span class='comment'># html and we add a line in the proc to insert it into the string
 </span>    <span class='kw'>else</span>
@@ -679,12 +676,12 @@ html file.</p>
       <pre class="lines">
 
 
-57
-58
-59</pre>
+55
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_html'>generate_html</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='kw'>self</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_create_proc_to_generate_html'>create_proc_to_generate_html</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span>
@@ -758,16 +755,16 @@ html file.</p>
       <pre class="lines">
 
 
-118
-119
 120
 121
 122
 123
-124</pre>
+124
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 118</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_keyword_type?'>keyword_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='const'>ALL_KEYWORDS</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_arr'>arr</span><span class='op'>|</span>
@@ -845,17 +842,115 @@ html file.</p>
       <pre class="lines">
 
 
-130
-131
 132
-133</pre>
+133
+134
+135</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 132</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parse_block_keyword'>parse_block_keyword</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_method'>method</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_param_name'>param_name</span> <span class='op'>=</span> <span class='id identifier rubyid_term'>term</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_key'>key</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_method'>method</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='embexpr_end'>}</span><span class='tstring_content'> do |</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_param_name'>param_name</span><span class='embexpr_end'>}</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parse_term-instance_method">
+  
+    - (<tt>string</tt>) <strong>parse_term</strong>(current_term) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the appropriate string to add to stringified_ruby based on the
+contents of the tag passed in</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>current_term</span>
+      
+      
+        <span class='type'>(<tt>string</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Contents of the tag passed in as a string</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>string</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>The correct string to add to stringified_ruby</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 95</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parse_term'>parse_term</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_keyword_type'>keyword_type</span> <span class='op'>=</span> <span class='id identifier rubyid_keyword_type?'>keyword_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_keyword_type'>keyword_type</span>
+  <span class='kw'>when</span> <span class='symbol'>:end</span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>end\n</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>when</span> <span class='symbol'>:block</span>
+    <span class='id identifier rubyid_parsed_line'>parsed_line</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_block_keyword'>parse_block_keyword</span><span class='lparen'>(</span><span class='id identifier rubyid_current_term'>current_term</span><span class='rparen'>)</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_parsed_line'>parsed_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>when</span> <span class='symbol'>:flow</span> <span class='kw'>then</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_current_term'>current_term</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span>
+  <span class='comment'># if no special keyword, then just insert the interpolated Ruby
+</span>  <span class='kw'>else</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>html &lt;&lt; (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_current_term'>current_term</span><span class='embexpr_end'>}</span><span class='tstring_content'>).to_s\n</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -921,12 +1016,12 @@ html file.</p>
       <pre class="lines">
 
 
-110
-111
-112</pre>
+112
+113
+114</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 110</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 112</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruby_tag?'>ruby_tag?</span><span class='lparen'>(</span><span class='id identifier rubyid_term'>term</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_term'>term</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;*</span><span class='tstring_end'>&#39;</span></span>
@@ -963,6 +1058,7 @@ html file.</p>
       <pre class="lines">
 
 
+29
 30
 31
 32
@@ -974,19 +1070,16 @@ html file.</p>
 38
 39
 40
-41
-42
-43</pre>
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/templater.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span>
   <span class='id identifier rubyid_check_min_args'>check_min_args</span>
 
   <span class='id identifier rubyid_template_name'>template_name</span><span class='comma'>,</span> <span class='id identifier rubyid_data_name'>data_name</span><span class='comma'>,</span> <span class='id identifier rubyid_output_name'>output_name</span> <span class='op'>=</span> <span class='const'>ARGV</span>
   <span class='id identifier rubyid_output_name'>output_name</span> <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>output.html</span><span class='tstring_end'>&#39;</span></span>
-
   <span class='comment'># Use OpenStruct instead of the Hash default to accomodate dot notation in
 </span>  <span class='comment'># the template file
 </span>  <span class='id identifier rubyid_data_object'>data_object</span> <span class='op'>=</span> <span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='const'>IO</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_data_name'>data_name</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>object_class:</span> <span class='const'>OpenStruct</span><span class='rparen'>)</span>
@@ -1005,7 +1098,7 @@ html file.</p>
 </div>
 
     <div id="footer">
-  Generated on Mon Jan  4 08:36:06 2016 by
+  Generated on Mon Jan  4 18:40:39 2016 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.6 (ruby-2.2.3).
 </div>
