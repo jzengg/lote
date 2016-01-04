@@ -46,7 +46,7 @@ a JSON file-name and an optional output file-name as arguments. Documented using
 ```
 ```html
 <ul>
-  <li> Draymond Greend </li>
+  <li> Draymond Green </li>
   <li> Kawhi Leonard </li>
 </ul>
 ```
