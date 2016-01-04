@@ -8,7 +8,6 @@ require 'ostruct'
 # optionally a name for the output-file. It writes a new file after parsing
 # the input HTML using the JSON data and evaluating Ruby as needed.
 # The template and data files should be in the same directory as the script.
-
 class Templater
   BLOCK_KEYWORDS = ['EACH']
   FLOW_KEYWORDS = ['IF', 'UNLESS', 'ELSE', 'ELSIF']
@@ -32,7 +31,6 @@ class Templater
 
     template_name, data_name, output_name = ARGV
     output_name ||= 'output.html'
-
     # Use OpenStruct instead of the Hash default to accomodate dot notation in
     # the template file
     data_object = JSON.parse(IO.read(data_name), object_class: OpenStruct)
@@ -64,33 +62,19 @@ class Templater
   # @param context [OpenStruct] JSON data converted into OpenStruct
   # @return [proc] Proc that returns the output HTML as a string when called
   def create_proc_to_generate_html(template, context)
-    # Example: terms = ["<html>\n", "<*", "1+2", "</html>\n"]
-    terms = template.split(PATTERN)
+    # Example: terms = ["<html>\n", "1+2", "<*", "</html>\n"]
+    terms = template.split(PATTERN).reverse
     # The base for the stringified proc which will be evaluated
     stringified_ruby = "Proc.new do |_|\n ; html=''\n"
 
     until terms.empty?
       # Go through the terms looking for the <* tag.
-      current_term = terms.shift
-
+      current_term = terms.pop
       if ruby_tag?(current_term)
-        # Once we find a Ruby tag, we reassign current_term to the contents of
-        # the tag and check what kind of keyterm it contains.
-        current_term = terms.shift
-        keyword_type = keyword_type?(current_term)
-
-        # We add the correct string to 'stringified_ruby' based on the type of
-        # keyword.
-        case keyword_type
-        when :end then stringified_ruby << "end\n"
-        when :block
-          parsed_line = parse_block_keyword(current_term)
-          stringified_ruby << "#{parsed_line}\n"
-        when :flow then stringified_ruby << "#{current_term.downcase}\n"
-        # if no special keyword, then just insert the interpolated Ruby
-        else stringified_ruby << "html << (#{current_term}).to_s\n"
-        end
-
+        # If we find a Ruby tag, we reassign current_term to the contents of
+        # the tag and add the appropriate line to our proc
+        current_term = terms.pop
+        stringified_ruby << parse_term(current_term)
       # If the term does not contain the <* tag, then it is presumably plain
       # html and we add a line in the proc to insert it into the string
       else
@@ -101,6 +85,24 @@ class Templater
     stringified_ruby << 'html; end'
     # Evaluate the stringified proc using the OpenStruct json as the context
     context.instance_eval(stringified_ruby)
+  end
+
+  # Returns the appropriate string to add to stringified_ruby based on the
+  # contents of the tag passed in
+  #
+  # @param current_term [string] Contents of the tag passed in as a string
+  # @return [string] The correct string to add to stringified_ruby
+  def parse_term(current_term)
+    keyword_type = keyword_type?(current_term)
+    case keyword_type
+    when :end then "end\n"
+    when :block
+      parsed_line = parse_block_keyword(current_term)
+      "#{parsed_line}\n"
+    when :flow then "#{current_term.downcase}\n"
+    # if no special keyword, then just insert the interpolated Ruby
+    else "html << (#{current_term}).to_s\n"
+    end
   end
 
   # Checks whether a term contains a tag that denotes Ruby
