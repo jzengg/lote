@@ -72,13 +72,12 @@ class Templater
     until terms.empty?
       # Go through the terms looking for the <* tag.
       current_term = terms.shift
-      next_term = terms.first unless terms.empty?
 
       if ruby_tag?(current_term)
-        # Once we find a Ruby tag, we check what kind of keyword the next term
-        # contains and reassign current_term to the contents of the tag.
-        keyword_type = keyword_type?(next_term)
+        # Once we find a Ruby tag, we reassign current_term to the contents of
+        # the tag and check what kind of keyterm it contains.
         current_term = terms.shift
+        keyword_type = keyword_type?(current_term)
 
         # We add the correct string to 'stringified_ruby' based on the type of
         # keyword.
