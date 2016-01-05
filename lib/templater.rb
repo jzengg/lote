@@ -92,16 +92,16 @@ class Templater
   #
   # @param current_term [string] Contents of the tag passed in as a string
   # @return [string] The correct string to add to stringified_ruby
-  def parse_term(current_term)
-    keyword_type = keyword_type?(current_term)
+  def parse_term(term)
+    keyword_type = keyword_type?(term)
     case keyword_type
     when :end then "end\n"
     when :block
-      parsed_line = parse_block_keyword(current_term)
+      parsed_line = parse_block_keyword(term)
       "#{parsed_line}\n"
-    when :flow then "#{current_term.downcase}\n"
+    when :flow then "#{term.downcase}\n"
     # if no special keyword, then just insert the interpolated Ruby
-    else "html << (#{current_term}).to_s\n"
+  else "html << (#{term}).to_s\n"
     end
   end
 
