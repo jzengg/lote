@@ -100,8 +100,8 @@ class Templater
       parsed_line = parse_block_keyword(term)
       "#{parsed_line}\n"
     when :flow then "#{term.downcase}\n"
-    # if no special keyword, then just insert the interpolated Ruby
-  else "html << (#{term}).to_s\n"
+    # if no special keyword, then insert interpolated term directly into html
+    else "html << (#{term}).to_s\n"
     end
   end
 
